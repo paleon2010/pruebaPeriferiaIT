@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de contratos · Chat del agente</title>
+  <style>
+    :root { --fondo:#f6f7f9; --tarjeta:#fff; --texto:#1d2330; --borde:#dfe3ea; --acento:#1f6f4a; --alerta:#b45309; --error:#b42318; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--fondo); color:var(--texto); }
+    header { padding:14px 20px; background:var(--tarjeta); border-bottom:1px solid var(--borde); display:flex; justify-content:space-between; align-items:center; }
+    header h1 { font-size:16px; margin:0; }
+    #estado { font-size:13px; color:#5b6474; }
+    main { max-width:820px; margin:0 auto; padding:16px; display:flex; flex-direction:column; min-height:calc(100vh - 60px); }
+    #chat { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-bottom:12px; }
+    .burbuja { padding:10px 14px; border-radius:12px; max-width:85%; white-space:pre-wrap; line-height:1.45; }
+    .burbuja.usuario { align-self:flex-end; background:var(--acento); color:#fff; }
+    .burbuja.asistente { align-self:flex-start; background:var(--tarjeta); border:1px solid var(--borde); }
+    .burbuja.error { align-self:flex-start; background:#fef3f2; color:var(--error); border:1px solid #fecdca; }
+    .llamada { align-self:flex-start; max-width:85%; background:#eef4ff; border:1px solid #c7d7fe; border-radius:10px; padding:6px 10px; font-size:13px; }
+    .llamada.fallo { background:#fef3f2; border-color:#fecdca; }
+    .llamada summary { cursor:pointer; }
+    .llamada pre { font-size:12px; overflow-x:auto; background:#fff; padding:8px; border-radius:6px; }
+    .confirmacion { align-self:stretch; background:#fffaeb; border:2px solid var(--alerta); border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .confirmacion strong { color:var(--alerta); }
+    form { display:flex; gap:8px; padding-top:8px; border-top:1px solid var(--borde); background:var(--fondo); position:sticky; bottom:0; }
+    textarea { flex:1; resize:none; padding:10px; font:inherit; border:1px solid var(--borde); border-radius:10px; min-height:44px; }
+    button { padding:10px 16px; font:inherit; border:0; border-radius:10px; background:var(--acento); color:#fff; cursor:pointer; }
+    button.secundario { background:var(--alerta); }
+    button:disabled { opacity:.5; cursor:default; }
+    .pensando { color:#5b6474; font-style:italic; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Registro de contratos vigentes</h1>
+    <span id="estado">Conectando…</span>
+  </header>
+  <main>
+    <div id="chat">
+      <div class="burbuja asistente">Hola. Puedo procesar el buzón de contratos, validar cada mensaje, registrar lo que esté limpio y generar el reporte de alertas. Prueba con: <em>procesa el buzón de contratos</em>.</div>
+    </div>
+    <form id="formulario">
+      <textarea id="entrada" rows="2" placeholder="Escribe tu instrucción…" required></textarea>
+      <button id="enviar" type="submit">Enviar</button>
+    </form>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
