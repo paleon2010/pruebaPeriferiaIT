@@ -75,6 +75,7 @@ Propuesta para el manejo corporativo de los contratos:
 6. **Duplicados y rechazados se marcan como procesados.** Si no, aparecerían en cada lectura del buzón. Queda como decisión pendiente de confirmar con la analista.
 7. **Modelo pequeño por defecto.** Haiku es suficiente para decidir herramientas. Se descartó Sonnet como valor por defecto por costo, aunque se puede cambiar con una variable.
 8. **Contrato marco como tipo propio.** Un marco no tiene valor ni póliza propia: la póliza se exige por cada orden de servicio. Tratarlo como contrato normal generaría una póliza pendiente que no corresponde. Se registra como `marco`, con valor indeterminado y la póliza como nota, no como estado.
+9. **Despliegue en Railway.** El proyecto se despliega con Docker y un volumen montado en `out/`, que conserva el maestro, el historial, el log y el presupuesto entre reinicios. Se descartó Netlify porque sus funciones no conservan archivos ni estado en memoria, y el proyecto depende de ambos.
 
 ## 8. Supuestos
 

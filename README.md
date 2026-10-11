@@ -62,3 +62,16 @@ demo.ts                      verificación sin modelo
 fixtures/                    datos entregados (solo lectura)
 out/                         salida generada en ejecución
 ```
+
+## Despliegue en Railway
+
+Railway usa el `Dockerfile` del proyecto. El estado (`out/`) debe persistir entre reinicios, así que necesita un volumen.
+
+1. En Railway, New Project → Deploy from GitHub repo → elige `pruebaPeriferiaIT`.
+2. En el servicio, Settings → Volumes → New Volume, con mount path `/app/out`.
+3. En Variables, define `ANTHROPIC_API_KEY` y `ACCESO_CLAVE`. `NODE_ENV=production` ya viene en el `Dockerfile`, y sin `ACCESO_CLAVE` el servidor no arranca.
+4. Opcional: `TOKENS_MAX_GLOBAL` para ajustar el presupuesto global.
+5. Settings → Networking → Generate Domain, y abre la URL.
+6. Comprueba `/api/health`: debe responder con `"configurado": true`.
+
+Railway asigna el puerto con la variable `PORT`, que el servidor ya lee.
