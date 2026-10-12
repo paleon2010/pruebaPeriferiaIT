@@ -128,7 +128,8 @@ No se usó ningún otro asistente de IA para construir la solución.
 - **Pruebas automáticas.** `bun test` pasa las 13 pruebas: seis de clasificación de los mensajes del buzón y siete de utilidades (montos, NIT, fechas, nombres y similitud).
 - **Demo sin modelo.** `bun run demo.ts` procesa los seis mensajes con los resultados de la sección 7.4 del PRD. Las alertas generan dos contratos que vencen en 60 días, dos pólizas pendientes y dos vencidos.
 - **Chat en local.** El servidor con `ACCESO_CLAVE` procesa el buzón desde el chat. msg-005 queda rechazado con el motivo de cotización, y msg-006 pide confirmación de valor, fecha de inicio y fecha de fin.
-- **Despliegue en Railway.** El servicio desplegado desde el repositorio, con volumen en `/app/out`, respondió y procesó el buzón. Después se retiró el servicio para evitar costos; el estado del volumen se eliminó.
+- **Despliegue en Railway.** Servicio desplegado desde el repositorio, con volumen en `/app/out` para conservar el maestro, el historial y el log. Verificado con `/api/health` (`configurado: true`) y con el chat, que procesa el buzón.
+- **URL de acceso:** https://reto-02-app-production.up.railway.app
+- **Acceso al chat:** requiere la clave definida en `ACCESO_CLAVE`. La API de salud (`/api/health`) es pública y no expone secretos.
 
 Fecha de inicio de msg-006: 2026-09-01, acordada con la analista.
-
