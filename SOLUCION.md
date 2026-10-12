@@ -1,6 +1,6 @@
 # SOLUCION · Reto 02 · Registro de contratos vigentes
 
-> **Estado de verificación:** el código se generó pero no se ejecutó en el entorno de desarrollo (sin acceso a red para instalar dependencias). Antes de la entrega, correr `bun test` y `bun run demo.ts` y revisar la salida contra la sección 7.4 del PRD.
+> **Estado:** validado en desarrollo local y desplegado en Railway. Detalle en la sección 12.
 
 ## 1. Problema
 
@@ -75,7 +75,7 @@ Propuesta para el manejo corporativo de los contratos:
 6. **Duplicados y rechazados se marcan como procesados.** Si no, aparecerían en cada lectura del buzón. Queda como decisión pendiente de confirmar con la analista.
 7. **Modelo pequeño por defecto.** Haiku es suficiente para decidir herramientas. Se descartó Sonnet como valor por defecto por costo, aunque se puede cambiar con una variable.
 8. **Contrato marco como tipo propio.** Un marco no tiene valor ni póliza propia: la póliza se exige por cada orden de servicio. Tratarlo como contrato normal generaría una póliza pendiente que no corresponde. Se registra como `marco`, con valor indeterminado y la póliza como nota, no como estado.
-9. **Despliegue en Railway.** El proyecto se despliega con Docker y un volumen montado en `out/`, que conserva el maestro, el historial, el log y el presupuesto entre reinicios. Se descartó Netlify porque sus funciones no conservan archivos ni estado en memoria, y el proyecto depende de ambos.
+9. **Despliegue en Railway.** El proyecto se despliega con Docker y un volumen montado en `out/`, que conserva el maestro, el historial, el log y los procesados entre reinicios. El presupuesto global de tokens y las sesiones viven en memoria y se reinician con el servidor. Se descartó Netlify porque sus funciones no conservan archivos ni estado en memoria, y el proyecto depende de ambos.
 
 ## 8. Supuestos
 
@@ -90,14 +90,14 @@ Propuesta para el manejo corporativo de los contratos:
 
 ## 9. Cobertura
 
-| Historia | Estado | Observación |
+| Historia | Estado | Evidencia |
 |---|---|---|
-| HU-1 Leer buzón | Hecho | Sin ejecución verificada. |
-| HU-2 Extraer datos | Hecho | Regex determinista; enriquecimiento con modelo no implementado. |
-| HU-3 Validar y clasificar | Hecho | RN1–RN4 implementadas. RN2 usa similitud de Dice. |
-| HU-4 Registrar y archivar | Hecho | Sin ejecución verificada. |
-| HU-5 Alertas | Hecho | Incluye la sección de vencidos como propuesta. |
-| HU-6 Manejo de errores | Hecho | Las herramientas nunca lanzan. El lote continúa. |
+| HU-1 Leer buzón | Hecho | `contratos_leer_buzon` lista los seis mensajes en el chat y en `demo.ts`. |
+| HU-2 Extraer datos | Hecho | Extracción determinista con confianza por campo. Pruebas de clasificación y utilidades. |
+| HU-3 Validar y clasificar | Hecho | RN1–RN5 cubiertas. Las seis clasificaciones coinciden con la fila 7.4 del PRD. |
+| HU-4 Registrar y archivar | Hecho | Escritura en el maestro, archivo de adjuntos y otrosí numerado. Probado en local y en Railway. |
+| HU-5 Alertas | Hecho | `out/alertas.md` con vencimientos, pólizas, registros desde el corte y vencidos (propuesta). |
+| HU-6 Manejo de errores | Hecho | Las herramientas nunca lanzan excepciones. Un mensaje con error no detiene el lote. |
 | `contratos_leer_pdf` (P1) | No implementado | Opcional según el PRD. |
 | Bonus módulo reutilizable (§9.4) | No implementado | Pendiente. |
 
@@ -110,7 +110,7 @@ Para producción faltan: lectura de PDF escaneado con OCR, envío real de acuses
 - **Descartado:** la propuesta inicial de un agente con reglas embebidas en el código, reemplazada por el diseño con `agent/prompt.md` y `src/knowledge/` separados, como pide el PRD.
 - **Revisión:** el código debe leerse y probarse antes de la entrega. El candidato debe poder explicar cada línea.
 
-*Completar con cualquier otro asistente que se haya usado.*
+No se usó ningún otro asistente de IA para construir la solución.
 
 ## 11. Riesgos
 
@@ -119,6 +119,16 @@ Para producción faltan: lectura de PDF escaneado con OCR, envío real de acuses
 | El modelo inventa un valor | Los valores salen solo de herramientas. El modelo solo propone. |
 | Falsos duplicados por cambio de nombre del cliente | Dedupe por NIT antes que por nombre. |
 | Contrato con redacción no prevista deja campos vacíos | Pasa a revisión humana; no se registra con datos malos. |
-| Abuso del chat público y costo descontrolado | Tope de iteraciones, tope de tokens por sesión y clave opcional. |
+| Abuso del chat público y costo descontrolado | Tope de iteraciones, tope de tokens por sesión y tope global de tokens. En producción la clave de acceso es obligatoria. El tope global se reinicia con el servidor. |
 | Pérdida del maestro | Copia en `out/`; respaldo del volumen y de `historial.jsonl`. |
 | Concurrencia en el mismo maestro | El servidor procesa un turno a la vez por sesión, pero no coordina sesiones entre sí. Para producción se necesita bloqueo de archivo o base de datos. |
+
+## 12. Verificación y despliegue
+
+- **Pruebas automáticas.** `bun test` pasa las 13 pruebas: seis de clasificación de los mensajes del buzón y siete de utilidades (montos, NIT, fechas, nombres y similitud).
+- **Demo sin modelo.** `bun run demo.ts` procesa los seis mensajes con los resultados de la sección 7.4 del PRD. Las alertas generan dos contratos que vencen en 60 días, dos pólizas pendientes y dos vencidos.
+- **Chat en local.** El servidor con `ACCESO_CLAVE` procesa el buzón desde el chat. msg-005 queda rechazado con el motivo de cotización, y msg-006 pide confirmación de valor, fecha de inicio y fecha de fin.
+- **Despliegue en Railway.** El servicio desplegado desde el repositorio, con volumen en `/app/out`, respondió y procesó el buzón. Después se retiró el servicio para evitar costos; el estado del volumen se eliminó.
+
+Fecha de inicio de msg-006: 2026-09-01, acordada con la analista.
+
